@@ -9,5 +9,7 @@ namespace SeaBattleTest.TestData
     public static class TestSettings
     {
         public static string mainPageLink = "http://ru.battleship-game.org";
+        public static int shuffleShipsFrom = 1;
+        public static int shuffleShipsTo = 15;
     }
 }
