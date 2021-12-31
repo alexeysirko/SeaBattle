@@ -5,7 +5,7 @@ using OpenQA.Selenium;
 
 namespace SeaBattleTest.Forms
 {
-    public class SeaBattleForm : Form
+    public class StartForm : Form
     {
         private static ILink randomRivalLink =
             ElementFactory.GetLink(By.XPath("//div[contains(@class,'battlefield-start-choose_rival')]//a[contains(@class,'choose_rival') and not(contains(@class,'connect'))]"), "randomRivalLink");
@@ -17,7 +17,7 @@ namespace SeaBattleTest.Forms
             ElementFactory.GetLabel(By.XPath("//div[contains(@class,'notification__move-on') and not(contains(@class,'none'))]"), "rivalLoadingNotification");
 
         
-        public SeaBattleForm() : base(randomRivalLink.Locator, "StartPageForm")
+        public StartForm() : base(randomRivalLink.Locator, "StartPageForm")
         {
         }
 

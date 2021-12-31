@@ -17,25 +17,25 @@ namespace SeaBattleTest.StepDefinitions
         [Given(@"I choose random rival")]
         public void GivenIChooseRandomEnemy()
         {
-            new SeaBattleForm().ChooseRadnomRival();
+            new StartForm().ChooseRadnomRival();
         }
 
         [Given(@"I randomly set ships")]
         public void GivenIRandomlySetShips()
         {
-            new SeaBattleForm().ClickRandomiseShipsButtonRandomTimes(TestSettings.shuffleShipsFrom, TestSettings.shuffleShipsTo);
+            new StartForm().ClickRandomiseShipsButtonRandomTimes(TestSettings.shuffleShipsFrom, TestSettings.shuffleShipsTo);
         }
 
         [Given(@"I click play button")]
         public void GivenIClickPlayButton()
         {
-            new SeaBattleForm().ClickPlayLink();
+            new StartForm().ClickPlayLink();
         }
 
         [Given(@"I wait untill enemy is loaded")]
         public void GivenIWaitUntillEnemyIsLoaded()
         {
-            new SeaBattleForm().WaitRivalToLoad();
+            new BattleForm().WaitRivalToLoad();
         }
 
         [Given(@"I play seaWars")]
