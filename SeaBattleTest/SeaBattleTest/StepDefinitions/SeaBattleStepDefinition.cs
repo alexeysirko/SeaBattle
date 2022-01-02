@@ -1,4 +1,5 @@
 using Aquality.Selenium.Browsers;
+using NUnit.Framework;
 using SeaBattleTest.Forms;
 using SeaBattleTest.TestData;
 using TechTalk.SpecFlow;
@@ -41,7 +42,10 @@ namespace SeaBattleTest.StepDefinitions
         [Given(@"I play seaWars")]
         public void GivenIPlaySeaWars()
         {
-            throw new PendingStepException();
+            var battleForm = new BattleForm();
+            battleForm.ClickCells(0,0);
+
+            Assert.Fail();
         }
     }
 }
