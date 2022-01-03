@@ -9,43 +9,38 @@ namespace SeaBattleTest.StepDefinitions
     [Binding]
     public class SeaBattleStepDefinition
     {
-        [Given(@"I move to start page")]
-        public void GivenIMoveToMainPage()
+        private ScenarioContext scenarioContext;
+
+        public SeaBattleStepDefinition(ScenarioContext scenarioContext)
+        {
+            this.scenarioContext = scenarioContext;
+        }
+
+        [Given(@"I start a game with random rival with randomly setted ships")]
+        public void GivenIStartAGameWithRandomRivalWithRandomlySettedShips()
         {
             AqualityServices.Browser.GoTo(TestSettings.mainPageLink);
-        }
-
-        [Given(@"I choose random rival")]
-        public void GivenIChooseRandomEnemy()
-        {
-            new StartForm().ChooseRadnomRival();
-        }
-
-        [Given(@"I randomly set ships")]
-        public void GivenIRandomlySetShips()
-        {
-            new StartForm().ClickRandomiseShipsButtonRandomTimes(TestSettings.shuffleShipsFrom, TestSettings.shuffleShipsTo);
-        }
-
-        [Given(@"I click play button")]
-        public void GivenIClickPlayButton()
-        {
-            new StartForm().ClickPlayLink();
-        }
-
-        [Given(@"I wait untill enemy is loaded")]
-        public void GivenIWaitUntillEnemyIsLoaded()
-        {
+            var startForm = new StartForm();
+            startForm.ChooseRadnomRival();
+            startForm.ClickRandomiseShipsButtonRandomTimes(TestSettings.shuffleShipsFrom, TestSettings.shuffleShipsTo);
+            startForm.ClickPlayLink();
             new BattleForm().WaitRivalToLoad();
         }
 
-        [Given(@"I play seaWars")]
-        public void GivenIPlaySeaWars()
+        [When(@"I play seaWars and save game results as '([^']*)' and '([^']*)'")]
+        public void WhenIPlaySeaWarsAndSaveGameResultsAsAnd(string gameResultMessage, string isWin)
         {
             var battleForm = new BattleForm();
-            battleForm.PlaySeaBattle();
+            bool isGameOverWin = false;
+            string gameResult = battleForm.PlaySeaBattle(ref isGameOverWin);
+            scenarioContext[isWin] = isGameOverWin;
+            scenarioContext[gameResultMessage] = gameResult;
+        }
 
-            Assert.Fail();
+        [Then(@"I see results of the game based on '([^']*)' and '([^']*)'")]
+        public void ThenISeeResultsOfTheGameBasedOnAnd(string gameResultMessage, string isWin)
+        {
+            Assert.IsTrue((bool)scenarioContext[isWin], (string)scenarioContext[gameResultMessage]);
         }
     }
 }
