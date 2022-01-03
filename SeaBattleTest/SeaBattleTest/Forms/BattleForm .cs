@@ -16,7 +16,7 @@ namespace SeaBattleTest.Forms
             = ElementFactory.FindElements<ILabel>(By.XPath("//div[contains(@class,'battlefield__rival')]//table[contains(@class,'battlefield-table')]//*[contains(@class,'battlefield-row')]"), "fieldSize")
             .Count;
 
-        private void waitForRivalFieldToBeAvailable()
+        private bool waitForRivalFieldToBeAvailable()
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival') and contains(@class,'battlefield__wait')]"), "waitForRivalFieldToBeAvailable")
             .State.WaitForNotExist();
         
@@ -51,60 +51,80 @@ namespace SeaBattleTest.Forms
                 {
                     FinishOffShip(x, y);
                 }
-            }                   
+            }
+
+            for (int x = fieldSize, y = 0; y < fieldSize; x--, y++)
+            {
+                ClickCell(x, y);
+                if (isLastHit)
+                {
+                    FinishOffShip(x, y);
+                }
+            }
         }
 
         private void ClickCell(int x, int y)
         {
-            waitForRivalFieldToBeAvailable();
-            if(isCellEmpty(x,y))
+            while (!waitForRivalFieldToBeAvailable());
+
+            if (isCellEmpty(x, y))
             {
                 battleFieldCell(x, y).Click();
-            }            
+            }
         }
 
         private void FinishOffShip(int cellX, int cellY)
         {
-            while(!isShipDone)
+            hitRigthRecursive(cellX, cellY);
+            hitLeftRecursive(cellX, cellY);
+            hitDownRecursive(cellX, cellY);
+            hitUpRecursive(cellX, cellY);
+        }
+
+        private void hitRigthRecursive(int cellX, int cellY)
+        {
+            if (cellX + 1 < fieldSize && isCellEmpty(cellX + 1, cellY))
             {
-                //Right
-                if (isCellEmpty(cellX+1, cellY))
+                ClickCell(cellX + 1, cellY);
+                if (isLastHit)
                 {
-                    ClickCell(cellX + 1, cellY);
-                    if(isLastHit)
-                    {
-                        FinishOffShip(cellX + 1, cellY);
-                    }                 
+                    hitRigthRecursive(cellX + 1, cellY);
                 }
+            }
+        }
 
-                //Left
-                if (isCellEmpty(cellX - 1, cellY))
+        private void hitLeftRecursive(int cellX, int cellY)
+        {
+            if (cellX - 1 >= 0 && isCellEmpty(cellX - 1, cellY))
+            {
+                ClickCell(cellX - 1, cellY);
+                if (isLastHit)
                 {
-                    ClickCell(cellX - 1, cellY);
-                    if (isLastHit)
-                    {
-                        FinishOffShip(cellX - 1, cellY);
-                    }
+                    hitLeftRecursive(cellX - 1, cellY);
                 }
+            }
+        }
 
-                //Down
-                if (isCellEmpty(cellX, cellY + 1))
+        private void hitUpRecursive(int cellX, int cellY)
+        {
+            if (cellY - 1 >= 0 && isCellEmpty(cellX, cellY - 1))
+            {
+                ClickCell(cellX, cellY - 1);
+                if (isLastHit)
                 {
-                    ClickCell(cellX, cellY + 1);
-                    if (isLastHit)
-                    {
-                        FinishOffShip(cellX, cellY + 1);
-                    }
+                    hitUpRecursive(cellX, cellY - 1);
                 }
+            }
+        }
 
-                //Up
-                if (isCellEmpty(cellX, cellY - 1))
+        private void hitDownRecursive(int cellX, int cellY)
+        {
+            if (cellY + 1 < fieldSize && isCellEmpty(cellX, cellY + 1))
+            {
+                ClickCell(cellX, cellY + 1);
+                if (isLastHit)
                 {
-                    ClickCell(cellX, cellY - 1);
-                    if (isLastHit)
-                    {
-                        FinishOffShip(cellX, cellY - 1);
-                    }
+                    hitDownRecursive(cellX, cellY + 1);
                 }
             }
         }
