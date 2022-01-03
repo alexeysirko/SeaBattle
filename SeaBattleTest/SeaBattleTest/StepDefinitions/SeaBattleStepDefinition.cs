@@ -43,7 +43,7 @@ namespace SeaBattleTest.StepDefinitions
         public void GivenIPlaySeaWars()
         {
             var battleForm = new BattleForm();
-            battleForm.ClickCells(0,0);
+            battleForm.PlaySeaBattle();
 
             Assert.Fail();
         }
