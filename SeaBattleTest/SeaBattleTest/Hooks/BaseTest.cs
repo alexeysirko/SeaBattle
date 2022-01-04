@@ -15,7 +15,7 @@ namespace SeaBattleTest.Hooks
         [AfterScenario]
         public void AfterScenario()
         {
-            //AqualityServices.Browser.Quit();
+            AqualityServices.Browser.Quit();
         }
     }
 }

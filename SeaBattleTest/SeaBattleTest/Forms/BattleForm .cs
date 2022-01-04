@@ -1,7 +1,9 @@
-﻿using Aquality.Selenium.Core.Elements;
+﻿using Aquality.Selenium.Browsers;
+using Aquality.Selenium.Core.Elements;
 using Aquality.Selenium.Elements.Interfaces;
 using Aquality.Selenium.Forms;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using SeaBattleTest.TestData;
 using SeaBattleTest.Utils;
 
@@ -23,9 +25,8 @@ namespace SeaBattleTest.Forms
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival') and contains(@class,'battlefield__wait')]"), "waitForRivalFieldToBeAvailable")
             .State.WaitForNotExist(TestSettings.rivalMaxWait);
 
-        private bool isLastHit
-            => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival')]//*[contains(@class,'battlefield-cell') and contains(@class,'last') and contains(@class,'hit')]"), "isLastHit")
-            .State.WaitForExist(TestSettings.htmlChangingWait);
+        private ILabel lastHit
+            => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival')]//*[contains(@class,'battlefield-cell') and contains(@class,'last') and contains(@class,'hit')]"), "isLastHit"); 
 
         private bool isShipDone
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival')]//*[contains(@class,'battlefield-cell') and contains(@class,'last') and contains(@class,'done')]"), "isShipDone")
@@ -33,31 +34,47 @@ namespace SeaBattleTest.Forms
        
         private bool isCellEmpty(int x, int y)
             => ElementFactory.GetLabel(By.XPath($"//div[contains(@class,'battlefield__rival')]//div[contains(@class,'battlefield-cell-content') and @data-y='{y}' and @data-x='{x}']//ancestor::*[contains(@class,'empty')]"), $"isCellEmpty({x},{y})")
-            .State.WaitForExist(TestSettings.htmlChangingWait);
+            .State.IsExist;
         
         private bool isRivalLeave
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'notification__rival-leave') and not(contains(@class,'none'))]"), "isGameOver")
-            .State.WaitForExist(TestSettings.htmlChangingWait);
+            .State.IsExist;
        
         private bool isGameOverWin
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'notification__game-over-win') and not(contains(@class,'none'))]"), "isGameOverWin")
-            .State.WaitForExist(TestSettings.htmlChangingWait);
+            .State.IsExist;
        
         private bool isGameOverLose
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'notification__game-over-lose') and not(contains(@class,'none'))]"), "isGameOverLose")
-            .State.WaitForExist(TestSettings.htmlChangingWait);
+            .State.IsExist;
 
         private bool isGameContinue
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'notification__move') and not(contains(@class,'none'))]"), "isGameContinue")
-            .State.WaitForExist(TestSettings.htmlChangingWait);
+            .State.IsExist;
+
 
         public BattleForm() : base(battleFieldCell(0, 0).Locator, "BattleForm")
         {
         }
 
+
         public void WaitRivalToLoad()
         {
             rivalIsLoadingNotification.State.WaitForNotExist();
+        }
+        private bool IsLastHit()
+        {
+            Thread.Sleep(TestSettings.htmlChangingWait);
+            return lastHit.State.WaitForExist(TestSettings.htmlChangingWait);
+        }
+
+        private void Shoot(int x, int y)
+        {
+            ClickCell(x, y);
+            if (IsLastHit())
+            {
+                FinishOffShip(x, y);
+            }
         }
 
         public string PlaySeaBattle(ref bool isWin)
@@ -67,21 +84,13 @@ namespace SeaBattleTest.Forms
                 //From left up to right down
                 for (int x = 0, y = 0; y < fieldSize; x++, y++)
                 {
-                    ClickCell(x, y);
-                    if (isLastHit && !isShipDone)
-                    {
-                        FinishOffShip(x, y);
-                    }
+                    Shoot(x, y);
                 }
 
                 //From right up to left down
                 for (int x = fieldSize - 1, y = 0; y < fieldSize; x--, ++y)
                 {
-                    ClickCell(x, y);
-                    if (isLastHit && !isShipDone)
-                    {
-                        FinishOffShip(x, y);
-                    }
+                    Shoot(x, y);
                 }
 
                 //Fill Unic Radnom rows
@@ -121,9 +130,9 @@ namespace SeaBattleTest.Forms
             if (cellX + 1 < fieldSize   
                 && isCellEmpty(cellX + 1, cellY)
                 && !isShipDone)
-            {               
+            {
                 ClickCell(cellX + 1, cellY);
-                if(isLastHit)
+                if (IsLastHit())
                 {
                     hitRigthRecursive(cellX + 1, cellY);
                 }
@@ -137,7 +146,7 @@ namespace SeaBattleTest.Forms
                 && !isShipDone)
             {
                 ClickCell(cellX - 1, cellY);
-                if (isLastHit)
+                if (IsLastHit())
                 {
                     hitLeftRecursive(cellX - 1, cellY);
                 }
@@ -151,7 +160,7 @@ namespace SeaBattleTest.Forms
                 && !isShipDone)
             {
                 ClickCell(cellX, cellY + 1);
-                if (isLastHit)
+                if (IsLastHit())
                 {
                     hitDownRecursive(cellX, cellY + 1);
                 }             
@@ -165,7 +174,7 @@ namespace SeaBattleTest.Forms
                 && !isShipDone)
             {
                 ClickCell(cellX, cellY - 1);
-                if (isLastHit)
+                if (IsLastHit())
                 {
                     hitUpRecursive(cellX, cellY - 1);
                 }
@@ -174,13 +183,9 @@ namespace SeaBattleTest.Forms
 
         private void FillRandomRow(int rowIndex)
         {
-            for (int x = 0, y = rowIndex; x < fieldSize - 1; x++)
+            for (int x = 0, y = rowIndex; x < fieldSize; x++)
             {
-                ClickCell(x, y);
-                if (isLastHit && !isShipDone)
-                {
-                    FinishOffShip(x, y);
-                }
+                Shoot(x, y);
             }
         }
 

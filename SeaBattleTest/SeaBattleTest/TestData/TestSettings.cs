@@ -11,7 +11,7 @@ namespace SeaBattleTest.TestData
         public static string mainPageLink = "http://ru.battleship-game.org";
         public static int shuffleShipsFrom = 1;
         public static int shuffleShipsTo = 15;
-        public static TimeSpan rivalMaxWait = TimeSpan.FromSeconds(60);
-        public static TimeSpan htmlChangingWait = TimeSpan.FromSeconds(3);
+        public static TimeSpan rivalMaxWait = TimeSpan.FromSeconds(20);
+        public static TimeSpan htmlChangingWait = TimeSpan.FromSeconds(0.5);
     }
 }
