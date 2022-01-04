@@ -14,9 +14,6 @@ namespace SeaBattleTest.Forms
         private static IButton battleFieldCell(int x, int y)
              => ElementFactory.GetButton(By.XPath($"//div[contains(@class,'battlefield__rival')]//div[contains(@class,'battlefield-cell-content') and @data-y='{y}' and @data-x='{x}']"), $"battleFieldCell({x},{y})", ElementState.ExistsInAnyState);
 
-        private ILabel rivalIsLoadingNotification
-            = ElementFactory.GetLabel(By.XPath("//div[contains(@class,'notification__waiting-for-rival') and not(contains(@class,'none'))]"), "rivalLoadingNotification");
-
         private readonly int fieldSize
             = ElementFactory.FindElements<ILabel>(By.XPath("//div[contains(@class,'battlefield__rival')]//table[contains(@class,'battlefield-table')]//*[contains(@class,'battlefield-row')]"), "fieldSize")
             .Count;
@@ -61,11 +58,12 @@ namespace SeaBattleTest.Forms
 
         public void WaitRivalToLoad()
         {
-            rivalIsLoadingNotification.State.WaitForNotExist();
+            AqualityServices.ConditionalWait.WaitForTrue(() => isGameContinue, TestSettings.rivalMaxWait);          
         }
 
         private void Shoot(int x, int y)
         {
+            CheckGameStatus();
             if (ClickCell(x, y))
             {
                 FinishOffShip(x, y);
