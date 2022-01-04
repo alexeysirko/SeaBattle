@@ -37,7 +37,7 @@ namespace SeaBattleTest.StepDefinitions
             scenarioContext[gameResultMessage] = gameResult;
         }
 
-        [Then(@"I see results of the game based on '([^']*)' and '([^']*)'")]
+        [Then(@"I assert results of the game based on '([^']*)' and '([^']*)'")]
         public void ThenISeeResultsOfTheGameBasedOnAnd(string gameResultMessage, string isWin)
         {
             Assert.IsTrue((bool)scenarioContext[isWin], (string)scenarioContext[gameResultMessage]);
