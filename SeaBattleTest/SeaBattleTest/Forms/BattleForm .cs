@@ -25,8 +25,9 @@ namespace SeaBattleTest.Forms
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival') and contains(@class,'battlefield__wait')]"), "waitForRivalFieldToBeAvailable")
             .State.WaitForNotExist(TestSettings.rivalMaxWait);
 
-        private ILabel lastHit
-            => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival')]//*[contains(@class,'battlefield-cell') and contains(@class,'last') and contains(@class,'hit')]"), "isLastHit"); 
+        private bool isCellHit(int x, int y)
+            => ElementFactory.GetLabel(By.XPath($"//div[contains(@class,'battlefield__rival')]//div[contains(@class,'battlefield-cell-content') and @data-y='{y}' and @data-x='{x}']//ancestor::*[contains(@class,'hit')]"), "isCellHit")
+            .State.WaitForExist(TestSettings.htmlChangingWait);
 
         private bool isShipDone
             => ElementFactory.GetLabel(By.XPath("//div[contains(@class,'battlefield__rival')]//*[contains(@class,'battlefield-cell') and contains(@class,'last') and contains(@class,'done')]"), "isShipDone")
@@ -62,16 +63,10 @@ namespace SeaBattleTest.Forms
         {
             rivalIsLoadingNotification.State.WaitForNotExist();
         }
-        private bool IsLastHit()
-        {
-            Thread.Sleep(TestSettings.htmlChangingWait);
-            return lastHit.State.WaitForExist(TestSettings.htmlChangingWait);
-        }
 
         private void Shoot(int x, int y)
         {
-            ClickCell(x, y);
-            if (IsLastHit())
+            if (ClickCell(x, y))
             {
                 FinishOffShip(x, y);
             }
@@ -107,14 +102,16 @@ namespace SeaBattleTest.Forms
             return "Game Over. Unknown reason.";
         }
 
-        private void ClickCell(int x, int y)
+        /// <returns>True, if shot is hit</returns>
+        private bool ClickCell(int x, int y)
         {         
             if (waitForRivalFieldToBeAvailable() && isCellEmpty(x, y))
             {
-                battleFieldCell(x, y).State.WaitForClickable();
                 waitForRivalFieldToBeAvailable();
                 battleFieldCell(x, y).WaitAndClick();
             }
+
+            return isCellHit(x, y);
         }
 
         private void FinishOffShip(int cellX, int cellY)
@@ -131,8 +128,7 @@ namespace SeaBattleTest.Forms
                 && isCellEmpty(cellX + 1, cellY)
                 && !isShipDone)
             {
-                ClickCell(cellX + 1, cellY);
-                if (IsLastHit())
+                if (ClickCell(cellX + 1, cellY))
                 {
                     hitRigthRecursive(cellX + 1, cellY);
                 }
@@ -144,9 +140,8 @@ namespace SeaBattleTest.Forms
             if (cellX - 1 >= 0
                 && isCellEmpty(cellX - 1, cellY)
                 && !isShipDone)
-            {
-                ClickCell(cellX - 1, cellY);
-                if (IsLastHit())
+            {              
+                if (ClickCell(cellX - 1, cellY))
                 {
                     hitLeftRecursive(cellX - 1, cellY);
                 }
@@ -159,8 +154,7 @@ namespace SeaBattleTest.Forms
                 && isCellEmpty(cellX, cellY + 1)
                 && !isShipDone)
             {
-                ClickCell(cellX, cellY + 1);
-                if (IsLastHit())
+                if (ClickCell(cellX, cellY + 1))
                 {
                     hitDownRecursive(cellX, cellY + 1);
                 }             
@@ -172,9 +166,8 @@ namespace SeaBattleTest.Forms
             if (cellY - 1 >= 0
                 && isCellEmpty(cellX, cellY - 1)
                 && !isShipDone)
-            {
-                ClickCell(cellX, cellY - 1);
-                if (IsLastHit())
+            {               
+                if (ClickCell(cellX, cellY - 1))
                 {
                     hitUpRecursive(cellX, cellY - 1);
                 }
